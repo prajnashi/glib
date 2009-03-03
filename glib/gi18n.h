@@ -19,8 +19,13 @@
 #ifndef __G_I18N_H__
 #define __G_I18N_H__
 
+
 #include <glib/gstrfuncs.h>
+#ifdef USE_LIBICONV_GNU
+/* No libicon and libintl in Android, so remove libintl with libicon
+ */
 #include <libintl.h>
+#endif /* USE_LIBICONV_GNU */
 
 #define _(String) gettext (String)
 #define Q_(String) g_strip_context ((String), gettext (String))
