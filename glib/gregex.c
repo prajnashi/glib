@@ -27,6 +27,7 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <glib/glibintl.h>
 #include <string.h>
 
 #ifdef USE_SYSTEM_PCRE
