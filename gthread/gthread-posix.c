@@ -32,6 +32,7 @@
  */
 
 #include "config.h"
+#include "glib.h"
 
 #include <pthread.h>
 #include <errno.h>
@@ -42,6 +43,8 @@
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
+
+extern gint g_thread_priority_map [G_THREAD_PRIORITY_URGENT + 1];
 
 #ifdef HAVE_SCHED_H
 #include <sched.h>
@@ -148,10 +151,14 @@ g_thread_impl_init(void)
 #endif /* HAVE_PRIORITIES */
 
 #ifdef USE_CLOCK_GETTIME
+#ifndef BUILD_WITH_ANDROID
  if (sysconf (_SC_MONOTONIC_CLOCK) >= 0)
    posix_clock = CLOCK_MONOTONIC;
  else
+#else
+   /* there is no CLOCK_MONOTONIC in Bionic C, replace it with CLOCK_REALTIME */
    posix_clock = CLOCK_REALTIME;
+#endif /* BUILD_WITH_ANDROID */  
 #endif
 }
 #endif /* _SC_THREAD_STACK_MIN || HAVE_PRIORITIES */
