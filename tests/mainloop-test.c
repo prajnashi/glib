@@ -403,6 +403,7 @@ main (int   argc,
   gint i;
 
   g_thread_init (NULL);
+  g_print("g_thread_init()\n");
 
   context_array = g_ptr_array_new ();
   context_array_mutex = g_mutex_new ();
@@ -410,17 +411,25 @@ main (int   argc,
 
   crawler_array = g_ptr_array_new ();
 
+  g_print("g_main_loop_new()\n");
   main_loop = g_main_loop_new (NULL, FALSE);
 
   for (i = 0; i < NTHREADS; i++)
+  {
+    g_print("create_adder_thread(), %d\n", i);
     create_adder_thread ();
+  }
 
   /* Wait for all threads to start
    */
+  g_print("Wait for all threads to start\n");
   g_mutex_lock (context_array_mutex);
   
   if (context_array->len < NTHREADS)
+  {
+    g_print("g_cond_wait()\n");
     g_cond_wait (context_array_cond, context_array_mutex);
+  }
   
   g_mutex_unlock (context_array_mutex);
   
