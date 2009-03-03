@@ -22,7 +22,28 @@
 
 #include "config.h"
 
+#ifdef USE_LIBICONV_GNU
+/*
+Remove libiconv in Android:
+
+All g_convert* api will return fail, if no USE_LIBICONV_GNU is defined.
+Fortunately, most g_convert user can handle it. Below is a list of all
+g_convert users.
+    ./glib/gmessages.c
+        strdup_convert() will duplicate input string, if g_convert returns fails
+    ./glib/gunicollate.c
+        g_utf8_collate() will compare original string,
+        if g_convert returns fails
+        g_utf8_collate_key() will duplicate input string, if g_convert returns 
+        fails
+
+Following test code is ignored
+    ./tests/unicode-encoding.c
+    ./tests/convert-test.c
+*/
 #include <iconv.h>
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,11 +62,13 @@
 
 #include "glibintl.h"
 
+#ifdef USE_LIBICONV_GNU
 #if defined(USE_LIBICONV_GNU) && !defined (_LIBICONV_H)
 #error GNU libiconv in use but included iconv.h not from libiconv
 #endif
 #if !defined(USE_LIBICONV_GNU) && defined (_LIBICONV_H)
 #error GNU libiconv not in use but included iconv.h is from libiconv
+#endif
 #endif
 
 #include "galias.h"
@@ -56,6 +79,7 @@ g_convert_error_quark (void)
   return g_quark_from_static_string ("g_convert_error");
 }
 
+#ifdef USE_LIBICONV_GNU /* Remove libiconv in Android */
 static gboolean
 try_conversion (const char *to_codeset,
 		const char *from_codeset,
@@ -88,6 +112,7 @@ try_to_aliases (const char **to_aliases,
 
   return FALSE;
 }
+#endif /* USE_LIBICONV_GNU */
 
 G_GNUC_INTERNAL extern const char ** 
 _g_charset_get_aliases (const char *canonical_name);
@@ -111,8 +136,9 @@ GIConv
 g_iconv_open (const gchar  *to_codeset,
 	      const gchar  *from_codeset)
 {
+#ifdef USE_LIBICONV_GNU /* Remove libiconv in Android */
   iconv_t cd;
-  
+ 
   if (!try_conversion (to_codeset, from_codeset, &cd))
     {
       const char **to_aliases = _g_charset_get_aliases (to_codeset);
@@ -139,6 +165,9 @@ g_iconv_open (const gchar  *to_codeset,
 
  out:
   return (cd == (iconv_t)-1) ? (GIConv)-1 : (GIConv)cd;
+#else
+  return (GIConv)-1;
+#endif /* USE_LIBICONV_GNU */
 }
 
 /**
@@ -165,9 +194,13 @@ g_iconv (GIConv   converter,
 	 gchar  **outbuf,
 	 gsize   *outbytes_left)
 {
+#ifdef USE_LIBICONV_GNU /* Remove libiconv in Android */
   iconv_t cd = (iconv_t)converter;
 
   return iconv (cd, inbuf, inbytes_left, outbuf, outbytes_left);
+#else
+  return -1;
+#endif /* USE_LIBICONV_GNU */
 }
 
 /**
@@ -188,13 +221,17 @@ g_iconv (GIConv   converter,
 gint
 g_iconv_close (GIConv converter)
 {
+#ifdef USE_LIBICONV_GNU /* Remove libiconv in Android */
   iconv_t cd = (iconv_t)converter;
 
   return iconv_close (cd);
+#else
+  return -1;
+#endif /* USE_LIBICONV_GNU */
 }
 
-
 #ifdef NEED_ICONV_CACHE
+#ifdef USE_LIBICONV_GNU  /* Remove libiconv in Android */
 
 #define ICONV_CACHE_SIZE   (16)
 
@@ -480,7 +517,7 @@ close_converter (GIConv converter)
   
   return 0;
 }
-
+#endif /* USE_LIBICONV_GNU */
 #else  /* !NEED_ICONV_CACHE */
 
 static GIConv
