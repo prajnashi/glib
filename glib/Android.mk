@@ -59,12 +59,12 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_MODULE:= libglib-2.0
 
-LOCAL_C_INCLUDES := \
-    $(LOCAL_PATH)/..                \
-    $(LOCAL_PATH)/../android        \
-    $(LOCAL_PATH)/libcharset        \
-    $(LOCAL_PATH)/gnulib            \
-    $(LOCAL_PATH)/pcre
+LOCAL_C_INCLUDES := 			\
+	$(GLIB_TOP)			\
+	$(GLIB_TOP)/android/		\
+	$(LOCAL_PATH)/libcharset        \
+	$(LOCAL_PATH)/gnulib            \
+	$(LOCAL_PATH)/pcre
 
 # ./glib private macros, copy from Makefile.am
 LOCAL_CFLAGS := \

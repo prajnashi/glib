@@ -3,16 +3,16 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
     gthread-impl.c         
-    
+
 LOCAL_SHARED_LIBRARIES := libglib-2.0
 
 LOCAL_MODULE:= libgthread-2.0
 
-LOCAL_C_INCLUDES := \
-    $(LOCAL_PATH)             \
-    $(LOCAL_PATH)/..          \
-    $(LOCAL_PATH)/../android  \
-    $(LOCAL_PATH)/../glib
+LOCAL_C_INCLUDES := 		\
+	$(LOCAL_PATH)		\
+	$(GLIB_TOP)		\
+	$(GLIB_TOP)/android	\
+	$(GLIB_TOP)/glib
 
 LOCAL_CFLAGS := \
     -DG_LOG_DOMAIN=\"GThread\"      \

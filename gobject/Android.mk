@@ -18,18 +18,16 @@ LOCAL_SRC_FILES:= \
     gvaluearray.c           \
     gvaluetransform.c       \
     gsourceclosure.c
-        
-         
-            
+
 LOCAL_SHARED_LIBRARIES := libglib-2.0
 
 LOCAL_MODULE:= libgobject-2.0
 
-LOCAL_C_INCLUDES := \
-    $(LOCAL_PATH)               \
-    $(LOCAL_PATH)/..            \
-    $(LOCAL_PATH)/../android    \
-    $(LOCAL_PATH)/../glib
+LOCAL_C_INCLUDES := 		\
+	$(LOCAL_PATH)		\
+	$(GLIB_TOP)		\
+	$(GLIB_TOP)/android	\
+	$(GLIB_TOP)/glib
 
 LOCAL_CFLAGS := \
     -DG_LOG_DOMAIN=\"GLib-GObject\" \
